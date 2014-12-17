@@ -1,5 +1,29 @@
 <section data-ng-controller="ConnexController" data-ng-init="find()">
-    <div class="page-header">
-        <h1>Test Connex</h1>
+    <div class="row">
+        <select ng-model="selectedServer.id" ng-options="s.id as s.name for s in servers | orderBy: 'name'" ng-change="connect()" ng-required></select>
+        <span ng-class="status === 'Connected' ? 'btn-xs btn-success' : (status === 'Connecting' ? 'btn-xs' : 'btn-xs btn-danger')">{{status}}</span><br/>
+        Username <input ng-model="selectedServer.userName" ng-change="connect()" ng-required></select><br/>
+        Password <input ng-model="selectedServer.password" ng-change="connect()" ng-required></select>
+    </div>
+    <div class="row">
+        <h2>Query</h2>
+        <div class="col-md-4">
+            <div class="page-form">
+                <form novalidate class="simple-form">
+                    <input ng-model="requestParams.domain" ng-required></select>
+                    <input type="submit" ng-click="update(requestParams)" value="Submit" />
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Request</h3>
+            <pre> {{requestParams | json}}</pre>
+        </div>
+        <div class="col-md-6">
+            <h3>Response</h3>
+            <pre> {{response | json}}</pre>
+        </div>
     </div>
 </section>

@@ -2,9 +2,9 @@
 
 module.exports = {
 	app: {
-		title: 'tv-connex-portal',
+		title: 'TruView Connex Portal',
 		description: 'A lightweight portal to make connex queries and visualize them',
-		keywords: 'TruView, '
+		keywords: 'TruView, Connex'
 	},
 	port: process.env.PORT || 3000,
 	templateEngine: 'swig',
@@ -41,5 +41,10 @@ module.exports = {
 			'public/lib/angular-mocks/angular-mocks.js',
 			'public/modules/*/tests/*.js'
 		]
-	}
+	},
+	servers: [
+		{name: 'localhost', url: 'https://127.0.0.1'},
+		{name: '10.250.11.76', url: 'https://10.250.11.76'},
+		{name: '10.250.10.66', url: 'https://10.250.10.66'}
+	]
 };
