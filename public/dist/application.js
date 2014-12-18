@@ -79,20 +79,29 @@ angular.module('connex').config(['$stateProvider',
 angular.module('connex').controller('ConnexController', ['$scope', '$stateParams', '$location', 'Connex', 'Servers',
     function($scope, $stateParams, $location, Connex, Servers) {
         $scope.status = 'Not Connected';
-        $scope.selectedServer = new Servers({
+        $scope.selectedServer = {
+            id: 0,
             userName: 'TVadmin',
-            password: 'tv'
-        });
-
-        $scope.requestParams = {
-            domain: 'default'
+            password: 'tv',
+            domain: 'Default'
         };
-        Servers.query(function(s){
-            $scope.servers = s;
-            $scope.selectedServer.url = s[0].url;
 
-            $scope.selectedServer.$connect();
-        });
+        Servers.list()
+            .$promise.then(function(servers){
+                $scope.selectedServer = angular.extend($scope.selectedServer, servers[0]);
+                $scope.servers = servers;
+                //attempt to connect to the selectedServer
+                $scope.connect();
+            });
+
+        $scope.connect = function(){
+            $scope.status = 'Connecting';
+            var server = new Servers($scope.selectedServer);
+            server.$connect({}, function(response){
+                    $scope.connectResponse = angular.copy(response);
+                    $scope.status = (response.statusCode === 400) ? 'Not Connected' : 'Connected';
+                });
+        };
     }
 ]);
 
@@ -111,10 +120,15 @@ angular.module('connex').factory('Connex', ['$resource',
 //servers service used for communicating with the servers REST endpoints
 angular.module('connex').factory('Servers', ['$resource',
     function($resource) {
-        return $resource('servers', {}, {
+        return $resource('/servers/:id', {id:'@id'}, {
+            list: {
+                method: 'GET',
+                isArray: true,
+                url: '/servers'
+            },
             connect: {
                 method: 'POST',
-                url: '/servers/:serverId'
+                url: '/servers/:id'
             }
         });
     }

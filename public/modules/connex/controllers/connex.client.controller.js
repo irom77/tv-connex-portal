@@ -6,12 +6,10 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
         $scope.selectedServer = {
             id: 0,
             userName: 'TVadmin',
-            password: 'tv'
+            password: 'tv',
+            domain: 'Default'
         };
 
-        $scope.requestParams = {
-            domain: 'default'
-        };
         Servers.list()
             .$promise.then(function(servers){
                 $scope.selectedServer = angular.extend($scope.selectedServer, servers[0]);
@@ -24,7 +22,8 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             $scope.status = 'Connecting';
             var server = new Servers($scope.selectedServer);
             server.$connect({}, function(response){
-                    $scope.status = response.status;
+                    $scope.connectResponse = angular.copy(response);
+                    $scope.status = (response.statusCode === 400) ? 'Not Connected' : 'Connected';
                 });
         };
     }
