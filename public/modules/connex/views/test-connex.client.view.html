@@ -1,32 +1,84 @@
 <section data-ng-controller="ConnexController" data-ng-init="find()">
     <div class="row">
         <div class="col-md-6">
-            <select ng-model="selectedServer.id" ng-options="s.id as s.name for s in servers | orderBy: 'name'" ng-change="connect()" ng-required></select>
-            <span ng-class="status === 'Connected' ? 'btn-xs btn-success' : (status === 'Connecting' ? 'btn-xs' : 'btn-xs btn-danger')">{{status}}</span><br/>
-            Username <input ng-model="selectedServer.userName" ng-change="connect()" ng-required></select><br/>
-            Password <input ng-model="selectedServer.password" ng-change="connect()" ng-required></select><br/>
-            Domain <input ng-model="selectedServer.domain" ng-change="connect()" ng-required></select>
+            <div class="form-group">
+                <span ng-class="status === 'Connected' ? 'btn-xs btn-success' : (status === 'Connecting' ? 'btn-xs' : 'btn-xs btn-danger')">{{status}}</span>
+                <select class="form-control" ng-model="selectedServer.id"
+                        ng-options="s.id as s.name for s in servers | orderBy: 'name'" ng-change="connect()"
+                        ng-required></select>
+                <span ng-click="showServerInfo()" title="Show/Hide the information about the selected server"
+                      class="glyphicon glyphicon-info-sign"></span>
+            </div>
         </div>
         <div class="col-md-6">
-            <h3>Connect Response</h3>
-            <pre> {{connectResponse | json}}</pre>
-        </div>
-    </div>
-    <div class="row">
-        <h2>Query</h2>
-        <div class="col-md-4">
-            <div class="page-form">
-                <form novalidate class="simple-form">
-                    <input ng-model="requestParams.domain" ng-required></select>
-                    <input type="submit" ng-click="update(requestParams)" value="Submit" />
-                </form>
+            <div class="form-group">
+                <label>Username</label><input class="form-control" ng-model="selectedServer.userName"
+                                              ng-change="connect()" ng-required></select>
+                <label>Password</label><input class="form-control" ng-model="selectedServer.password"
+                                              ng-change="connect()" ng-required></select>
+                <label>Domain </label><input class="form-control" ng-model="selectedServer.domain" ng-change="connect()"
+                                             ng-required></select>
             </div>
         </div>
     </div>
-    <div class="row">
+    <div>
+        <div ng-hide="hideServerInfo" class="ng-hide">
+            <h3>TruView Info</h3>
+            <pre> {{connectResponse | json}}</pre>
+        </div>
+    </div>
+    <div class="row" ng-hide="status !== 'Connected'">
+        <h2>Query</h2>
+
+        <div class="col-md-4">
+            <div class="form-group">
+                <form novalidate class="simple-form">
+                    <label>query</label>
+                    <select class="form-control" ng-model="queryParams.query" ng-required>
+                        <option ng-repeat="query in queries" tooltip="{{query.description}}" value="{{query.query}}">
+                            {{query.query}}
+                        </option>
+                    </select>
+                    <label>startTime</label>
+
+                    <div class="dropdown">
+                        <a class="dropdown-toggle" role="button" data-toggle="dropdown" data-target="#" href="#">
+                            <div class="input-group"><input type="text" class="form-control"
+                                                            data-ng-model="queryParams.startTime"><span
+                                    class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <datetimepicker data-ng-model="queryParams.startTime"
+                                            data-datetimepicker-config="{startView: 'minute'}"/>
+                        </ul>
+                    </div>
+                    <label>endTime</label>
+
+                    <div class="dropdown">
+                        <a class="dropdown-toggle" role="button" data-toggle="dropdown" data-target="#" href="#">
+                            <div class="input-group"><input type="text" class="form-control"
+                                                            data-ng-model="queryParams.endTime"><span
+                                    class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <datetimepicker data-ng-model="queryParams.endTime"
+                                            data-datetimepicker-config="{startView: 'minute'}"/>
+                        </ul>
+                    </div>
+                </form>
+                <input type="submit" class="btn btn-default" ng-click="makeConnexQuery(queryParams)" value="Submit"/>
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-hide="drawChart === false">
+        chart goes here
+    </div>
+    <div class="row" ng-hide="!responseRecieved">
         <div class="col-md-6">
             <h3>Request</h3>
-            <pre> {{requestParams | json}}</pre>
+            <pre> {{queryParams | json}}</pre>
         </div>
         <div class="col-md-6">
             <h3>Response</h3>

@@ -40,7 +40,7 @@ exports.connect = function(req, res) {
             domain: req.body.domain,
             query: 'info'
         });
-    console.log("Connecting to: " + server.url);
+    console.log('Connecting to: ' + server.url);
     //make an info request
     request({
         url: server.url + config.connexBaseUrl,
