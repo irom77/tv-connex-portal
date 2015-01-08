@@ -80,6 +80,18 @@ exports.makeQuery = function(req, res) {
     if(_.has(payload, 'serverId') && !_.isUndefined(payload.serverId)){
         requestObj.params.filter= 'serverId='+payload.serverId;
     }
+    if(_.has(payload, 'applicationId') && !_.isUndefined(payload.applicationId)){
+        if(!!requestObj.params.filter){
+            requestObj.params.filter += ' AND ';
+        }
+        requestObj.params.filter += 'applicationId='+payload.applicationId;
+    }
+    if(_.has(payload, 'siteId') && !_.isUndefined(payload.siteId)){
+        if(!!requestObj.params.filter){
+            requestObj.params.filter += ' AND ';
+        }
+        requestObj.params.filter += 'siteId='+payload.siteId;
+    }
 
     // make the request
     makeConnexRequest(requestObj, function(response){

@@ -82,6 +82,20 @@
                     </div>
                 </div>
                 <div class="col-md-4">
+                    <label>Application</label>
+                    <select class="form-control" ng-model="queryParams.applicationId">
+                        <option ng-repeat="application in apmApplications" tooltip="{{application.ApplicationDescription}}"
+                                value="{{application.ApplicationId}}">
+                            {{application.ApplicationName}}
+                        </option>
+                    </select>
+                    <label>Site</label>
+                    <select class="form-control" ng-model="queryParams.siteId">
+                        <option ng-repeat="site in apmSites" tooltip="{{site.SiteDescription}}"
+                                value="{{site.SiteId}}">
+                            {{site.SiteName}}
+                        </option>
+                    </select>
                     <label>Server</label>
                     <select class="form-control" ng-model="queryParams.serverId">
                         <option ng-repeat="server in apmServers" tooltip="{{server.ServerDescription}}"

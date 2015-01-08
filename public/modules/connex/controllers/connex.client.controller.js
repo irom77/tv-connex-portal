@@ -25,12 +25,9 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
         //charting config
         $scope.chartData = [];
         $scope.chartSeries = [
-            {y: 'EurtV2', color: 'green', type: 'area', label: 'EurtV2'},
-            {y: 'Eurt', color: 'gray', type: 'area', label: 'Eurt'},
-            {y: 'ClientDelay', color: 'yellow', type: 'line', label: 'ClientDelay'},
-            {y: 'NetworkDelay', color: 'purple', type: 'line', label: 'NetworkDelay'},
-            {y: 'ServerDelay', color: 'orange', type: 'line', label: 'ServerDelay'},
-            {y: 'ApplicationDelay', color: 'blue', type: 'line', label: 'ApplicationDelay'},
+            {y: 'EurtV2', color: 'green', type: 'area', label: 'EurtV2', min: 0},
+            {y: 'Eurt', color: 'gray', type: 'area', label: 'Eurt', min: 0},
+            {y: 'ClientDelay', color: 'yellow', type: 'line', label: 'ClientDelay', min: 0}
         ];
         $scope.chartOptions = {
             axes: {
@@ -71,6 +68,7 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
                         //set the default query to 'ApmServerTrend'
                         $scope.queryParams.query = $scope.queries[0].query;
 
+                        $scope.getApmApplications();
                         $scope.getApmServers();
                         $scope.getApmSites();
                     }
@@ -108,6 +106,15 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             connection.$makeQuery({}, callback);
         };
 
+        $scope.getApmApplications = function(){
+            var queryParams = angular.copy($scope.queryParams);
+            queryParams.query = 'APMTopApplications';
+            $scope.makeConnexQuery(queryParams, function(response){
+                $scope.apmApplications = response.Table;
+                $scope.apmApplications.unshift({ApplicationName: "None", ApplicationDescription: "", "ApplicationId": -1});
+                $scope.queryParams.applicationId = -1;
+            })
+        };
         $scope.getApmServers = function(){
             var queryParams = angular.copy($scope.queryParams);
             queryParams.query = 'APMTopServers';
@@ -122,14 +129,21 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             queryParams.query = 'APMTopSites';
             $scope.makeConnexQuery(queryParams, function(response){
                 $scope.apmSites = response.Table;
+                $scope.apmSites.unshift({SiteName: "None", SiteDescription: "", "SiteId": -1});
+                $scope.queryParams.siteId = -1;
             })
         };
 
         $scope.sanitizeFilters = function(params){
             //TODO fix coersion bug
             if(params.serverId == -1){
-                console.log('sanitizing server id');
                 delete params['serverId'];
+            }
+            if(params.siteId == -1){
+                delete params['siteId'];
+            }
+            if(params.applicationId == -1){
+                delete params['applicationId'];
             }
         }
     }
