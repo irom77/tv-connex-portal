@@ -27,7 +27,10 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
         $scope.chartSeries = [
             {y: 'EurtV2', color: 'green', type: 'area', label: 'EurtV2', min: 0},
             {y: 'Eurt', color: 'gray', type: 'area', label: 'Eurt', min: 0},
-            {y: 'ClientDelay', color: 'yellow', type: 'line', label: 'ClientDelay', min: 0}
+            {y: 'ClientDelay', color: 'yellow', type: 'line', label: 'ClientDelay', min: 0},
+            {y: 'NetworkDelay', color: 'purple', type: 'line', label: 'NetworkDelay'},
+            {y: 'ServerDelay', color: 'orange', type: 'line', label: 'ServerDelay'},
+            {y: 'ApplicationDelay', color: 'blue', type: 'line', label: 'ApplicationDelay'},
         ];
         $scope.chartOptions = {
             axes: {
