@@ -13,12 +13,7 @@ var config = require('../../config/config'),
  */
 var qsDefaults = {
         format: 'json'
-    },
-    servers = config.servers;
-//add ids to the servers
-for(var i = 0; i < servers.length; i++){
-    servers[i].id = i;
-}
+    };
 
 /**
  * List of Servers
@@ -32,18 +27,16 @@ exports.list = function(req, res) {
  */
 exports.connect = function(req, res) {
     //TODO add error handling
-    //right now, ids are simply indexes
-    var server = servers[req.params.id],
-        qs = _.defaults(qsDefaults, {
+    var qs = _.defaults(qsDefaults, {
             userName: req.body.userName,
             password: req.body.password,
             domain: req.body.domain,
             query: 'info'
         });
-    console.log('Connecting to: ' + server.url);
+    console.log('Connecting to: ' + req.body.url);
     //make an info request
     request({
-        url: server.url + config.connexBaseUrl,
+        url: req.body.url + config.connexBaseUrl,
         json: qs.format === 'json',
         strictSSL: false,
         qs: qs

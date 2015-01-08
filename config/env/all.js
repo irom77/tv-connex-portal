@@ -53,10 +53,5 @@ module.exports = {
 			'public/modules/*/tests/*.js'
 		]
 	},
-	servers: [
-		//{name: '10.250.10.45', url: 'http://10.250.10.45'},
-		{name: '10.250.10.66', url: 'http://10.250.10.66'},
-		//{name: '10.250.11.76', url: 'https://10.250.11.76'}
-	],
 	connexBaseUrl: '/Portal/Portal/Services/ConnexDataAccess.ashx'
 };

@@ -10,6 +10,6 @@ module.exports = function(app) {
     // Servers Routes
     app.route('/servers')
         .get(servers.list);
-    app.route('/servers/:id')
+    app.route('/servers')
         .post(servers.connect);
 };

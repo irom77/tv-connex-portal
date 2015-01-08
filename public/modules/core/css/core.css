@@ -13,3 +13,14 @@
 .ng-valid.ng-dirty {
 	border-color: #78FA89;
 }
+
+.animate-show {
+	transition: all linear .5s;
+	-webkit-animation-delay: .5s; /* Chrome, Safari, Opera */
+	animation-delay: .5s;
+	opacity: 1;
+}
+
+.animate-show.ng-hide {
+	opacity:0;
+}
