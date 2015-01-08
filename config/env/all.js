@@ -15,9 +15,12 @@ module.exports = {
 			css: [
 				'public/lib/bootstrap/dist/css/bootstrap.css',
 				'public/lib/bootstrap/dist/css/bootstrap-theme.css',
-				'public/lib/angular-bootstrap-datetimepicker/src/css/datetimepicker.css'
+				'public/lib/angular-bootstrap-datetimepicker/src/css/datetimepicker.css',
+				'public/lib/json-edit/css/styles.css'
 			],
 			js: [
+				'public/lib/jquery/dist/jquery.min.js',
+				'public/lib/jquery-ui/jquery-ui.min.js',
 				'public/lib/angular/angular.js',
 				'public/lib/angular-resource/angular-resource.js', 
 				'public/lib/angular-cookies/angular-cookies.js', 
@@ -29,7 +32,11 @@ module.exports = {
 				'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
 				'public/lib/lodash/dist/lodash.min.js',
 				'public/lib/moment/moment.js',
-				'public/lib/angular-bootstrap-datetimepicker/src/js/datetimepicker.js'
+				'public/lib/angular-bootstrap-datetimepicker/src/js/datetimepicker.js',
+				'public/lib/d3/d3.min.js',
+				'public/lib/n3-line-chart/dist/line-chart.min.js',
+				'public/lib/angular-ui-sortable/sortable.min.js',
+				'public/lib/json-edit/js/directives.js'
 			]
 		},
 		css: [

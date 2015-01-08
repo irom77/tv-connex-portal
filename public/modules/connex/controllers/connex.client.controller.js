@@ -6,6 +6,7 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
         $scope.hideServerInfo = true;
         $scope.responseRecieved = false;
         $scope.drawChart = false;
+        $scope.selectedTab = 'response';
         $scope.selectedServer = {
             id: 0,
             userName: 'TVadmin',
@@ -14,9 +15,26 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
         };
         $scope.queryParams = {
             query: null,
-            startTime: new Date(new Date().getTime() - (60 * 60 * 1000)),
+            startTime: new Date(new Date().getTime() - (240 * 60 * 1000)),
             endTime: new Date()
         };
+
+        //charting config
+        $scope.chartData = [];
+        $scope.chartOptions = {
+            axes: {
+                x: {key: 'x', type: 'date', ticks: 5},
+                y: {type: 'linear', ticks: 5}
+            },
+            series: [
+                {y: 'EurtV2', color: 'steelblue', type: 'area', label: 'EurtV2'},
+                {y: 'Eurt', color: 'black', type: 'area', label: 'Eurt'}
+            ],
+            lineMode: 'linear',
+            tension: 0.7,
+            drawLegend: true
+        };
+        $scope.chartableMetrics = [];
 
         Servers.list()
             .$promise.then(function(servers){
@@ -44,16 +62,31 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
 
                         //set the default query to the first one
                         $scope.queryParams.query = $scope.queries[0].query;
+
+                        $scope.getApmServers();
                     }
                 });
         };
+
         $scope.showServerInfo = function(){
             $scope.hideServerInfo = !($scope.hideServerInfo);
         };
 
-        $scope.makeConnexQuery = function(queryParams){
-            //detect if the data will be chartable
-            $scope.drawChart = queryParams.query.indexOf('Trend') !== -1;
+        $scope.makeConnexQuery = function(queryParams, cbk){
+            var callback = cbk || function(response){
+                    $scope.response = response;
+                    $scope.responseRecieved = true;
+
+                    //detect if the data will be chartable
+                    $scope.drawChart = queryParams.query.indexOf('Trend') !== -1;
+                    //if drawChart is true, render the chart
+                    if($scope.drawChart && response.Table){
+                        $scope.chartData = angular.copy(response.Table);
+                        _.forEach($scope.chartData, function(dataItem) { dataItem.x = new Date(dataItem.StartTime)});
+                    }
+                };
+            //mark that the response is not received
+            $scope.responseRecieved = false;
             var params = angular.copy(queryParams);
             params.userName = $scope.selectedServer.userName;
             params.password = $scope.selectedServer.password;
@@ -63,10 +96,15 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
                 return server.id === $scope.selectedServer.id;
             }).url;
             var connection = new Connex(params);
-            connection.$makeQuery({}, function(response){
-                $scope.response = response;
-                $scope.responseRecieved = true;
-            });
+            connection.$makeQuery({}, callback);
         };
+
+        $scope.getApmServers = function(){
+            var queryParams = angular.copy($scope.queryParams);
+            queryParams.query = "APMTopServers";
+            $scope.makeConnexQuery(queryParams, function(response){
+                $scope.apmServers = response.Table;
+            })
+        }
     }
 ]);

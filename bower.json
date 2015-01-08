@@ -16,6 +16,7 @@
     "angular-ui-router": "~0.2.11",
     "modernizr": "~2.8.3",
     "lodash": "~2.4.1",
-    "angular-bootstrap-datetimepicker": "~0.3.8"
+    "angular-bootstrap-datetimepicker": "~0.3.8",
+    "n3-line-chart": "~1.1.4"
   }
 }

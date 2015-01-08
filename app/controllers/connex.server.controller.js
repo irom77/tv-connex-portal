@@ -71,10 +71,15 @@ exports.makeQuery = function(req, res) {
             format: 'json',
             startTime: payload.startTime,
             endTime: payload.endTime,
-            //filter: 'applicationId='+payload.applicationId+' AND siteId=' + payload.siteId,
+            filter: '',
             allowV1Metrics: 'true'
         }
     };
+
+    //build out the filter
+    if(_.has(payload, 'serverId') && !_.isUndefined(payload.serverId)){
+        requestObj.params.filter= 'serverId='+payload.serverId;
+    }
 
     // make the request
     makeConnexRequest(requestObj, function(response){
