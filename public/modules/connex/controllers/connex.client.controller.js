@@ -11,7 +11,7 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
         $scope.protocols = ['http://', 'https://'];
         $scope.selectedServer = {
             protocol: $scope.protocols[0],
-            ip: '10.250.10.45',
+            ip: 'localhost',
             userName: 'TVadmin',
             password: 'tv',
             domain: 'Default'
@@ -27,10 +27,7 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
         $scope.chartSeries = [
             {y: 'EurtV2', color: 'green', type: 'area', label: 'EurtV2', min: 0},
             {y: 'Eurt', color: 'gray', type: 'area', label: 'Eurt', min: 0},
-            {y: 'ClientDelay', color: 'yellow', type: 'line', label: 'ClientDelay', min: 0},
-            {y: 'NetworkDelay', color: 'purple', type: 'line', label: 'NetworkDelay'},
-            {y: 'ServerDelay', color: 'orange', type: 'line', label: 'ServerDelay'},
-            {y: 'ApplicationDelay', color: 'blue', type: 'line', label: 'ApplicationDelay'},
+            {y: 'NetworkDelay', color: 'purple', type: 'line', label: 'NetworkDelay'}
         ];
         $scope.chartOptions = {
             axes: {
@@ -92,7 +89,16 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
                     //if drawChart is true, render the chart
                     if($scope.drawChart && response.Table){
                         $scope.chartData = angular.copy(response.Table);
-                        _.forEach($scope.chartData, function(dataItem) { dataItem.x = new Date(dataItem.StartTime)});
+                        _.forEach($scope.chartData, function(dataItem) {
+                            dataItem.x = new Date(dataItem.StartTime);
+                            //sanitize the nulls
+                            var key = null;
+                            for(key in dataItem){
+                                if(dataItem[key] === ""){
+                                    obj[key] = 0;
+                                }
+                            }
+                        });
                     }
                 };
             //mark that the response is not received
