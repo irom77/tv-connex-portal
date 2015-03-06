@@ -24,11 +24,10 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
 
         //charting config
         $scope.chartData = [];
-        $scope.chartSeries = [
-            {y: 'EurtV2', color: 'green', type: 'area', label: 'EurtV2', min: 0},
-            {y: 'Eurt', color: 'gray', type: 'area', label: 'Eurt', min: 0},
-            {y: 'NetworkDelay', color: 'purple', type: 'line', label: 'NetworkDelay'}
-        ];
+        $scope.chartSeries = ['EurtV2', 'Eurt'];
+        $scope.chartSeriesCache = angular.copy($scope.chartSeries);
+        //the data table that is returned via the connex query
+        $scope.data = [];
         $scope.chartOptions = {
             axes: {
                 x: {key: 'x', type: 'date', ticks: 5},
@@ -40,12 +39,6 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             tension: 0.7,
             drawLegend: true
         };
-
-        $scope.setChartOptions = function(){
-            $scope.chartOptions.series = angular.copy($scope.chartSeries);
-        };
-        //set the chart options to start
-        $scope.setChartOptions();
 
         $scope.connect = function(){
             $scope.status = 'Connecting';
@@ -79,6 +72,23 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             $scope.hideServerInfo = !($scope.hideServerInfo);
         };
 
+        $scope.updateChartData = function(){
+            var chartData = [];
+            //initialize the series
+            _.forEach($scope.chartSeries, function(key){
+                chartData.push({
+                    key: key,
+                    values: []
+                });
+            });
+            _.forEach($scope.data, function(dataItem) {
+                _.forEach(chartData, function(seriesObj){
+                    seriesObj.values.push([new Date(dataItem.StartTime).getTime(),Number(dataItem[seriesObj.key])]);
+                })
+            });
+            $scope.chartData = chartData;
+        };
+
         $scope.makeConnexQuery = function(queryParams, cbk){
             var callback = cbk || function(response){
                     $scope.response = response;
@@ -88,17 +98,8 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
                     $scope.drawChart = queryParams.query.indexOf('Trend') !== -1;
                     //if drawChart is true, render the chart
                     if($scope.drawChart && response.Table){
-                        var chartData = angular.copy(response.Table);
-                        _.forEach(chartData, function(dataItem) {
-                            dataItem.x = new Date(dataItem.StartTime).getTime();
-                            //sanitize the nulls
-                            for(var key in dataItem){
-                                if(dataItem[key] === ""){
-                                    dataItem[key] = 0;
-                                }
-                            }
-                        });
-                        $scope.chartData = chartData;
+                        $scope.data = angular.copy(response.Table);
+                        $scope.updateChartData();
                     }
                 };
             //mark that the response is not received
@@ -160,6 +161,10 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             if(params.endTime){
                 params.endTime = new Date(params.endTime);
             }
-        }
+        },
+        $scope.setChartOptions = function(){
+            $scope.chartSeries = angular.copy($scope.chartSeriesCache);
+            $scope.updateChartData($scope.data);
+        };
     }
 ]);

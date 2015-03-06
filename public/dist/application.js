@@ -156,9 +156,6 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
         };
 
         $scope.makeConnexQuery = function(queryParams, cbk){
-            //sanitize start and end times
-            queryParams.startTime = new Date(queryParams.startTime).toString();
-            queryParams.startTime = new Date(queryParams.endTime).toString();
             var callback = cbk || function(response){
                     $scope.response = response;
                     $scope.responseRecieved = true;
@@ -167,17 +164,17 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
                     $scope.drawChart = queryParams.query.indexOf('Trend') !== -1;
                     //if drawChart is true, render the chart
                     if($scope.drawChart && response.Table){
-                        $scope.chartData = angular.copy(response.Table);
-                        _.forEach($scope.chartData, function(dataItem) {
-                            dataItem.x = new Date(dataItem.StartTime);
+                        var chartData = angular.copy(response.Table);
+                        _.forEach(chartData, function(dataItem) {
+                            dataItem.x = new Date(dataItem.StartTime).getTime();
                             //sanitize the nulls
-                            var key = null;
-                            for(key in dataItem){
+                            for(var key in dataItem){
                                 if(dataItem[key] === ""){
-                                    obj[key] = 0;
+                                    dataItem[key] = 0;
                                 }
                             }
                         });
+                        $scope.chartData = chartData;
                     }
                 };
             //mark that the response is not received
@@ -232,6 +229,12 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             }
             if(params.applicationId == -1){
                 delete params['applicationId'];
+            }
+            if(params.startTime){
+                params.startTime = new Date(params.startTime);
+            }
+            if(params.endTime){
+                params.endTime = new Date(params.endTime);
             }
         }
     }

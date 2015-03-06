@@ -16,6 +16,7 @@ module.exports = {
 				'public/lib/bootstrap/dist/css/bootstrap.css',
 				'public/lib/bootstrap/dist/css/bootstrap-theme.css',
 				'public/lib/angular-bootstrap-datetimepicker/src/css/datetimepicker.css',
+                'public/lib/nvd3/build/nv.d3.css',
 				'public/lib/json-edit/css/styles.css'
 			],
 			js: [
@@ -34,7 +35,8 @@ module.exports = {
 				'public/lib/moment/moment.js',
 				'public/lib/angular-bootstrap-datetimepicker/src/js/datetimepicker.js',
 				'public/lib/d3/d3.min.js',
-				'public/lib/n3-line-chart/dist/line-chart.min.js',
+                'public/lib/nvd3/build/nv.d3.js',
+                'public/lib/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.min.js',
 				'public/lib/angular-ui-sortable/sortable.min.js',
 				'public/lib/json-edit/js/directives.js'
 			]
