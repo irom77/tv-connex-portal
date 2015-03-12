@@ -17,6 +17,7 @@
 .animate-show {
 	transition: all linear .5s;
 	-webkit-animation-delay: .5s; /* Chrome, Safari, Opera */
+    -moz-animation-delay: .5s;
 	animation-delay: .5s;
 	opacity: 1;
 }

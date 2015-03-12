@@ -24,7 +24,14 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
 
         //charting config
         $scope.chartData = [];
-        $scope.chartSeries = ['EurtV2', 'Eurt'];
+        $scope.chartSeries = ['EurtV2', 'Eurt', 'NetworkDelay'];
+        //initialize the series
+        _.forEach($scope.chartSeries, function(key){
+            $scope.chartData.push({
+                key: key,
+                values: []
+            });
+        });
         $scope.chartSeriesCache = angular.copy($scope.chartSeries);
         //the data table that is returned via the connex query
         $scope.data = [];
@@ -83,8 +90,12 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             });
             _.forEach($scope.data, function(dataItem) {
                 _.forEach(chartData, function(seriesObj){
-                    seriesObj.values.push([new Date(dataItem.StartTime).getTime(),Number(dataItem[seriesObj.key])]);
-                })
+                    if(Number(dataItem[seriesObj.key])){
+                        seriesObj.values.push([new Date(dataItem.StartTime).getTime(),Number(dataItem[seriesObj.key])]);
+                    } else {
+                        console.log("NAN returned: " + dataItem[seriesObj.key]);
+                    }
+                });
             });
             $scope.chartData = chartData;
         };
@@ -121,39 +132,39 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             queryParams.query = 'APMTopApplications';
             $scope.makeConnexQuery(queryParams, function(response){
                 $scope.apmApplications = response.Table;
-                $scope.apmApplications.unshift({ApplicationName: "None", ApplicationDescription: "", "ApplicationId": -1});
+                $scope.apmApplications.unshift({ApplicationName: 'None', ApplicationDescription: '', 'ApplicationId': -1});
                 $scope.queryParams.applicationId = -1;
-            })
+            });
         };
         $scope.getApmServers = function(){
             var queryParams = angular.copy($scope.queryParams);
             queryParams.query = 'APMTopServers';
             $scope.makeConnexQuery(queryParams, function(response){
                 $scope.apmServers = response.Table;
-                $scope.apmServers.unshift({ServerHostName: "None", ServerDescription: "", "ServerId": -1});
+                $scope.apmServers.unshift({ServerHostName: 'None', ServerDescription: '', 'ServerId': -1});
                 $scope.queryParams.serverId = -1;
-            })
+            });
         };
         $scope.getApmSites = function(){
             var queryParams = angular.copy($scope.queryParams);
             queryParams.query = 'APMTopSites';
             $scope.makeConnexQuery(queryParams, function(response){
                 $scope.apmSites = response.Table;
-                $scope.apmSites.unshift({SiteName: "None", SiteDescription: "", "SiteId": -1});
+                $scope.apmSites.unshift({SiteName: 'None', SiteDescription: '', 'SiteId': -1});
                 $scope.queryParams.siteId = -1;
-            })
+            });
         };
 
         $scope.sanitizeFilters = function(params){
             //TODO fix coersion bug
-            if(params.serverId == -1){
-                delete params['serverId'];
+            if(params.serverId === -1){
+                delete params.serverId;
             }
-            if(params.siteId == -1){
-                delete params['siteId'];
+            if(params.siteId === -1){
+                delete params.siteId;
             }
-            if(params.applicationId == -1){
-                delete params['applicationId'];
+            if(params.applicationId === -1){
+                delete params.applicationId;
             }
             if(params.startTime){
                 params.startTime = new Date(params.startTime);
@@ -161,10 +172,25 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             if(params.endTime){
                 params.endTime = new Date(params.endTime);
             }
-        },
+        };
+
         $scope.setChartOptions = function(){
             $scope.chartSeries = angular.copy($scope.chartSeriesCache);
             $scope.updateChartData($scope.data);
+        };
+
+        $scope.xAxisTickFormat = function(){
+            return function(d){
+                return d3.time.format('%x-%H:%M')(new Date(d));
+            }
+        };
+
+        $scope.yAxisTickFormat = function(){
+            return function(d){
+                if(typeof d === 'number'){
+                    return d.toPrecision(5);
+                }
+            }
         };
     }
 ]);

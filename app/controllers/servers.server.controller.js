@@ -16,13 +16,6 @@ var qsDefaults = {
     };
 
 /**
- * List of Servers
- */
-exports.list = function(req, res) {
-    res.json(servers);
-};
-
-/**
  * Connect to a server
  */
 exports.connect = function(req, res) {

@@ -18,7 +18,7 @@ var app = require('./config/express')();
 app.listen(config.port);
 
 // Expose app
-exports = module.exports = app;
+module.exports = app;
 
 // Logging initialization
 console.log('tv-connex-portal started on port ' + config.port);

@@ -53,7 +53,7 @@ ApplicationConfiguration.registerModule('core');
 'use strict';
 
 // Configuring the connex module
-angular.module('connex', ['ui.bootstrap.datetimepicker', 'n3-line-chart', 'JSONedit']).run(['Menus',
+angular.module('connex', ['ui.bootstrap.datetimepicker', 'nvd3ChartDirectives', 'JSONedit']).run(['Menus',
     function(Menus) {
         // Set top bar menu items
         Menus.addMenuItem('topbar', 'Connex', 'connex', 'item');
@@ -100,11 +100,10 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
 
         //charting config
         $scope.chartData = [];
-        $scope.chartSeries = [
-            {y: 'EurtV2', color: 'green', type: 'area', label: 'EurtV2', min: 0},
-            {y: 'Eurt', color: 'gray', type: 'area', label: 'Eurt', min: 0},
-            {y: 'NetworkDelay', color: 'purple', type: 'line', label: 'NetworkDelay'}
-        ];
+        $scope.chartSeries = ['EurtV2', 'Eurt', 'NetworkDelay'];
+        $scope.chartSeriesCache = angular.copy($scope.chartSeries);
+        //the data table that is returned via the connex query
+        $scope.data = [];
         $scope.chartOptions = {
             axes: {
                 x: {key: 'x', type: 'date', ticks: 5},
@@ -116,12 +115,6 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             tension: 0.7,
             drawLegend: true
         };
-
-        $scope.setChartOptions = function(){
-            $scope.chartOptions.series = angular.copy($scope.chartSeries);
-        };
-        //set the chart options to start
-        $scope.setChartOptions();
 
         $scope.connect = function(){
             $scope.status = 'Connecting';
@@ -155,6 +148,23 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             $scope.hideServerInfo = !($scope.hideServerInfo);
         };
 
+        $scope.updateChartData = function(){
+            var chartData = [];
+            //initialize the series
+            _.forEach($scope.chartSeries, function(key){
+                chartData.push({
+                    key: key,
+                    values: []
+                });
+            });
+            _.forEach($scope.data, function(dataItem) {
+                _.forEach(chartData, function(seriesObj){
+                    seriesObj.values.push([new Date(dataItem.StartTime).getTime(),Number(dataItem[seriesObj.key])]);
+                });
+            });
+            $scope.chartData = chartData;
+        };
+
         $scope.makeConnexQuery = function(queryParams, cbk){
             var callback = cbk || function(response){
                     $scope.response = response;
@@ -164,17 +174,8 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
                     $scope.drawChart = queryParams.query.indexOf('Trend') !== -1;
                     //if drawChart is true, render the chart
                     if($scope.drawChart && response.Table){
-                        var chartData = angular.copy(response.Table);
-                        _.forEach(chartData, function(dataItem) {
-                            dataItem.x = new Date(dataItem.StartTime).getTime();
-                            //sanitize the nulls
-                            for(var key in dataItem){
-                                if(dataItem[key] === ""){
-                                    dataItem[key] = 0;
-                                }
-                            }
-                        });
-                        $scope.chartData = chartData;
+                        $scope.data = angular.copy(response.Table);
+                        $scope.updateChartData();
                     }
                 };
             //mark that the response is not received
@@ -196,39 +197,39 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             queryParams.query = 'APMTopApplications';
             $scope.makeConnexQuery(queryParams, function(response){
                 $scope.apmApplications = response.Table;
-                $scope.apmApplications.unshift({ApplicationName: "None", ApplicationDescription: "", "ApplicationId": -1});
+                $scope.apmApplications.unshift({ApplicationName: 'None', ApplicationDescription: '', 'ApplicationId': -1});
                 $scope.queryParams.applicationId = -1;
-            })
+            });
         };
         $scope.getApmServers = function(){
             var queryParams = angular.copy($scope.queryParams);
             queryParams.query = 'APMTopServers';
             $scope.makeConnexQuery(queryParams, function(response){
                 $scope.apmServers = response.Table;
-                $scope.apmServers.unshift({ServerHostName: "None", ServerDescription: "", "ServerId": -1});
+                $scope.apmServers.unshift({ServerHostName: 'None', ServerDescription: '', 'ServerId': -1});
                 $scope.queryParams.serverId = -1;
-            })
+            });
         };
         $scope.getApmSites = function(){
             var queryParams = angular.copy($scope.queryParams);
             queryParams.query = 'APMTopSites';
             $scope.makeConnexQuery(queryParams, function(response){
                 $scope.apmSites = response.Table;
-                $scope.apmSites.unshift({SiteName: "None", SiteDescription: "", "SiteId": -1});
+                $scope.apmSites.unshift({SiteName: 'None', SiteDescription: '', 'SiteId': -1});
                 $scope.queryParams.siteId = -1;
-            })
+            });
         };
 
         $scope.sanitizeFilters = function(params){
             //TODO fix coersion bug
-            if(params.serverId == -1){
-                delete params['serverId'];
+            if(params.serverId === -1){
+                delete params.serverId;
             }
-            if(params.siteId == -1){
-                delete params['siteId'];
+            if(params.siteId === -1){
+                delete params.siteId;
             }
-            if(params.applicationId == -1){
-                delete params['applicationId'];
+            if(params.applicationId === -1){
+                delete params.applicationId;
             }
             if(params.startTime){
                 params.startTime = new Date(params.startTime);
@@ -236,7 +237,18 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             if(params.endTime){
                 params.endTime = new Date(params.endTime);
             }
-        }
+        };
+
+        $scope.setChartOptions = function(){
+            $scope.chartSeries = angular.copy($scope.chartSeriesCache);
+            $scope.updateChartData($scope.data);
+        };
+
+        $scope.xAxisFormat = function(){
+            return function(d){
+                return d3.time.format('%H:%M')(moment.unix(d).toDate());
+            };
+        };
     }
 ]);
 
