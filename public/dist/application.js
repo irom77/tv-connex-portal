@@ -53,7 +53,7 @@ ApplicationConfiguration.registerModule('core');
 'use strict';
 
 // Configuring the connex module
-angular.module('connex', ['ui.bootstrap.datetimepicker', 'nvd3ChartDirectives', 'JSONedit']).run(['Menus',
+angular.module('connex', ['ui.bootstrap.datetimepicker', 'nvd3ChartDirectives']).run(['Menus',
     function(Menus) {
         // Set top bar menu items
         Menus.addMenuItem('topbar', 'Connex', 'connex', 'item');
@@ -101,6 +101,13 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
         //charting config
         $scope.chartData = [];
         $scope.chartSeries = ['EurtV2', 'Eurt', 'NetworkDelay'];
+        //initialize the series
+        _.forEach($scope.chartSeries, function(key){
+            $scope.chartData.push({
+                key: key,
+                values: []
+            });
+        });
         $scope.chartSeriesCache = angular.copy($scope.chartSeries);
         //the data table that is returned via the connex query
         $scope.data = [];
@@ -159,7 +166,11 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             });
             _.forEach($scope.data, function(dataItem) {
                 _.forEach(chartData, function(seriesObj){
-                    seriesObj.values.push([new Date(dataItem.StartTime).getTime(),Number(dataItem[seriesObj.key])]);
+                    if(Number(dataItem[seriesObj.key])){
+                        seriesObj.values.push([new Date(dataItem.StartTime).getTime(),Number(dataItem[seriesObj.key])]);
+                    } else {
+                        console.log("NAN returned: " + dataItem[seriesObj.key]);
+                    }
                 });
             });
             $scope.chartData = chartData;
@@ -244,9 +255,17 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
             $scope.updateChartData($scope.data);
         };
 
-        $scope.xAxisFormat = function(){
+        $scope.xAxisTickFormat = function(){
             return function(d){
-                return d3.time.format('%H:%M')(moment.unix(d).toDate());
+                return d3.time.format('%x-%H:%M')(new Date(d));
+            };
+        };
+
+        $scope.yAxisTickFormat = function(){
+            return function(d){
+                if(typeof d === 'number'){
+                    return d.toPrecision(5);
+                }
             };
         };
     }

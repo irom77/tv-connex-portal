@@ -37,8 +37,7 @@ module.exports = {
 				'public/lib/d3/d3.min.js',
                 'public/lib/nvd3/build/nv.d3.js',
                 'public/lib/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.min.js',
-				'public/lib/angular-ui-sortable/sortable.min.js',
-				'public/lib/json-edit/js/directives.js'
+				'public/lib/angular-ui-sortable/sortable.min.js'
 			]
 		},
 		css: [

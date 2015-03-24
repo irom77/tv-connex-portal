@@ -134,8 +134,12 @@
         <div ng-hide="selectedTab !== 'response'">
             <pre> {{response | json}}</pre>
         </div>
-        <div class="row" ng-hide="drawChart === false || selectedTab !== 'chartOptions'">
-            <div class="col-md-12"><json child="chartSeriesCache" default-collapsed="false" type="object"></json></div>
+        <div ng-hide="drawChart === false || selectedTab !== 'chartOptions'">
+            <div class="row" ng-repeat="optionCache in chartSeriesCache">
+                <div class="col-md-12">
+                    <input ng-model="optionCache.value" class="form-control">
+                </div>
+            </div>
             <button type="button" ng-click="setChartOptions()">Apply</button>
         </div>
     </div>

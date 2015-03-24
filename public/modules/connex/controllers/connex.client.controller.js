@@ -24,15 +24,18 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
 
         //charting config
         $scope.chartData = [];
-        $scope.chartSeries = ['EurtV2', 'Eurt', 'NetworkDelay'];
+        $scope.chartSeriesCache = [];
+        $scope.chartSeries = ['EurtV2', 'Eurt', 'ClientDelay', 'NetworkDelay'];
         //initialize the series
         _.forEach($scope.chartSeries, function(key){
             $scope.chartData.push({
                 key: key,
                 values: []
             });
+            $scope.chartSeriesCache.push({
+                value: key
+            });
         });
-        $scope.chartSeriesCache = angular.copy($scope.chartSeries);
         //the data table that is returned via the connex query
         $scope.data = [];
         $scope.chartOptions = {
@@ -175,14 +178,14 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
         };
 
         $scope.setChartOptions = function(){
-            $scope.chartSeries = angular.copy($scope.chartSeriesCache);
+            $scope.chartSeries = $scope.chartSeriesCache.map(function(val){return val.value;});
             $scope.updateChartData($scope.data);
         };
 
         $scope.xAxisTickFormat = function(){
             return function(d){
                 return d3.time.format('%x-%H:%M')(new Date(d));
-            }
+            };
         };
 
         $scope.yAxisTickFormat = function(){
@@ -190,7 +193,7 @@ angular.module('connex').controller('ConnexController', ['$scope', '$stateParams
                 if(typeof d === 'number'){
                     return d.toPrecision(5);
                 }
-            }
+            };
         };
     }
 ]);
